@@ -1,0 +1,69 @@
+name: Prodogy Deployment Readiness
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+  security-events: write
+
+jobs:
+  prodogy-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: Stage-Freak/prodogy-v2@v0.2.0
+        with:
+          fail-on: error
+
+      - name: Upload SARIF
+        if: always() && hashFiles('prodogy.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: prodogy.sarif
+        continue-on-error: true
+
+      - name: Post PR comment
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let report;
+            try { report = JSON.parse(fs.readFileSync('prodogy.json', 'utf8')); }
+            catch (e) { console.log('No report'); return; }
+            const findings = (report.findings || []).filter(f => !f.suppressed);
+            if (findings.length === 0) { console.log('Clean'); return; }
+            const sev = { critical: '🛑', error: '❌', warning: '⚠️', info: 'ℹ️' };
+            const order = { critical: 4, error: 3, warning: 2, info: 1 };
+            const sorted = findings.sort((a, b) => (order[b.severity]||0) - (order[a.severity]||0));
+            const counts = {};
+            for (const f of sorted) counts[f.severity] = (counts[f.severity] || 0) + 1;
+            let body = '## 🚀 Prodogy — Deployment Readiness Report\n\n';
+            body += `Scanned **${report.summary.scanned_files}** file(s) — `;
+            body += `🛑 ${counts.critical||0} critical, ❌ ${counts.error||0} error, ⚠️ ${counts.warning||0} warning, ℹ️ ${counts.info||0} info.\n\n`;
+            const blocking = sorted.filter(f => order[f.severity] >= 3);
+            body += blocking.length
+              ? `> ⚠️ **${blocking.length} finding(s) at or above 'error'** — gate **FAILS**.\n\n`
+              : '> ✅ No findings at or above `error` — gate **passes**.\n\n';
+            body += '<details><summary>Findings</summary>\n\n| Severity | Rule | File | Issue |\n|---|---|---|---|\n';
+            for (const f of sorted) {
+              const loc = f.location.line ? `${f.location.path}:${f.location.line}` : f.location.path;
+              body += `| ${sev[f.severity]||''} ${f.severity} | \`${f.rule_id}\` | \`${loc}\` | ${f.message.replace(/\|/g, '\\|')} |\n`;
+            }
+            body += '\n</details>\n\n_Powered by [Prodogy](https://github.com/Stage-Freak/prodogy-v2)._';
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body.includes('Prodogy — Deployment Readiness'));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner: context.repo.owner, repo: context.repo.repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body });
+            }

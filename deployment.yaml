@@ -1,0 +1,15 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: web-app
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: web
+          image: myapp/web:latest
+          ports:
+            - containerPort: 3000
+          securityContext:
+            privileged: true
