@@ -1,8 +1,4 @@
-FROM node:latest
-
-ENV DB_PASSWORD=Sup3rS3cr3t!
-
-ADD https://example.com/app.tar.gz /app/
+FROM node:20-alpine
 
 WORKDIR /app
 COPY package.json .
