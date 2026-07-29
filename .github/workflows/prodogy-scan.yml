@@ -18,7 +18,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: Stage-Freak/prodogy-v2@v0.2.0
+      - uses: Stage-Freak/prodogy-v2@main
         with:
           fail-on: error
 
