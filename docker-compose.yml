@@ -21,8 +21,6 @@ services:
   cache:
     image: redis:latest
     privileged: true
-    environment:
-      MASTER_PASSWORD: p@ssw0rd!
     ports:
       - "6379:6379"
 
