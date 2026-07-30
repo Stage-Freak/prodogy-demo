@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: web-app
@@ -8,8 +8,13 @@ spec:
     spec:
       containers:
         - name: web
-          image: myapp/web:latest
+          image: myapp/web:1.0.0
           ports:
             - containerPort: 3000
-          securityContext:
-            privileged: true
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"

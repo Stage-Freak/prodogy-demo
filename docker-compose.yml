@@ -2,19 +2,26 @@ version: "3.8"
 services:
   web:
     build: .
-    image: myapp/web:latest
+    image: myapp/web:1.0.0
     ports:
       - "8080:80"
-    environment:
-      DB_PASSWORD: Sup3rS3cr3t!
-      API_TOKEN: sk-live-abc123def456
     depends_on:
       - db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+    restart: unless-stopped
 
   db:
     image: postgres:latest
     environment:
-      POSTGRES_PASSWORD: changeme
     volumes:
       - pgdata:/var/lib/postgresql/data
 
@@ -26,3 +33,10 @@ services:
 
 volumes:
   pgdata:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+
