@@ -47,3 +47,8 @@ services:
         limits:
           cpus: "0.5"
           memory: "512M"
+
+  rabbitmq:
+    image: rabbitmq:latest
+    environment:
+      PASSWORD: admin@123
