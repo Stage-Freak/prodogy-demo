@@ -48,17 +48,13 @@ services:
           cpus: "0.5"
           memory: "512M"
 
-  rabbitmq:
-    image: rabbitmq:4.0-management-alpine
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+
+  redis:
+    image: redis:16-alpine
     env_file:
-      - rabbitmq.env
+      - redis.env
     deploy:
       resources:
         limits:
           cpus: "0.5"
+          memory: "512M"
