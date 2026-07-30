@@ -52,3 +52,14 @@ services:
     image: rabbitmq:latest
     environment:
       PASSWORD: admin@123
+
+
+  redis:
+    image: redis:16-alpine
+    env_file:
+      - redis.env
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
