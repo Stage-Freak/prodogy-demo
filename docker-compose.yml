@@ -47,3 +47,14 @@ services:
         limits:
           cpus: "0.5"
           memory: "512M"
+
+
+  redis:
+    image: redis:16-alpine
+    env_file:
+      - redis.env
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
