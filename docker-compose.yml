@@ -27,7 +27,23 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
   mongo:
-    image: mongo:latest
-    environment:
-      MONGO_INITDB_ROOT_PASSWORD: SuperSecret123
+    image: mongo:7.0-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    env_file:
+      - mongo.env
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
