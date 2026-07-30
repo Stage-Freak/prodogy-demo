@@ -1,2 +1,3 @@
 # Demo repo — all files intentionally tracked for scanning
 mongo.env
+.env
