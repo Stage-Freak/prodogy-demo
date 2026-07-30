@@ -25,5 +25,5 @@ jobs:
           # Uncomment and set secrets/variables in repo Settings to enable LLM enrichment:
           # enrich: true
           # llm-api-key: ${{ secrets.PRODOGY_LLM_API_KEY }}
-          # llm-provider-url: https://generativelanguage.googleapis.com/v1beta/openai/
-          # llm-model: gemini-2.0-flash
+          # llm-provider-url: https://openrouter.ai/api/v1
+          # llm-model: openrouter/free
