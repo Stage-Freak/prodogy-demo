@@ -51,5 +51,10 @@ services:
 
   redis:
     image: redis:latest
-    environment:
-      REDIS_PASSWORD: Password@123
+    env_file:
+      - redis.env
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
