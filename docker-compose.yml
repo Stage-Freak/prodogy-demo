@@ -50,7 +50,7 @@ services:
 
 
   redis:
-    image: redis:latest
+    image: redis:16-alpine
     env_file:
       - redis.env
     deploy:
