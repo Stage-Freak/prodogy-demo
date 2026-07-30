@@ -47,3 +47,9 @@ services:
         limits:
           cpus: "0.5"
           memory: "512M"
+
+
+  redis:
+    image: redis:latest
+    environment:
+      REDIS_PASSWORD: Password@123
